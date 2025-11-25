@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://box-service.eu
+
+# Sitemaps
+Sitemap: https://box-service.eu/sitemap.xml

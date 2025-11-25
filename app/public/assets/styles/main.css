@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.modal-content {
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.modal-header {
+  border-bottom: none;
+}
+
+.modal-body {
+  padding: 0;
+}
+
+
+/* Custom styles */
+body {
+  @apply bg-gray-50;
+}
+
+.hero-section {
+  @apply bg-primary text-white rounded-lg p-8 mb-8;
+}
+
+.storage-card {
+  @apply border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow;
+}

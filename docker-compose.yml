@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  nextjs:
+    build: .
+    container_name: mon-projet-nextjs
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://ws.box-service.eu
+    volumes:
+      - .:/app
+      - /app/node_modules
