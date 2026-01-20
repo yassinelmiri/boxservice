@@ -162,8 +162,8 @@ const BookingsPage: React.FC = () => {
             setError(null);
         } catch (err) {
             const errorMessage =
-                err instanceof Error ? err.message : "An unknown error occurred";
-            setError("Failed to fetch bookings. " + errorMessage);
+                err instanceof Error ? err.message : "Une erreur inconnue est survenue";
+            setError("Échec de la récupération des réservations. " + errorMessage);
             console.error(err);
         } finally {
             setLoading(false);
@@ -179,7 +179,7 @@ const BookingsPage: React.FC = () => {
             });
             setUsers(response.data);
         } catch (err) {
-            console.error("Failed to fetch users", err);
+            console.error("Échec de la récupération des utilisateurs", err);
         }
     };
 
@@ -193,9 +193,9 @@ const BookingsPage: React.FC = () => {
             setUnits(response.data);
         } catch (err) {
             const errorMessage =
-                err instanceof Error ? err.message : "An unknown error occurred";
-            setError("Failed to fetch units. " + errorMessage);
-            console.error("Failed to fetch units", err);
+                err instanceof Error ? err.message : "Une erreur inconnue est survenue";
+            setError("Échec de la récupération des unités. " + errorMessage);
+            console.error("Échec de la récupération des unités", err);
         }
     };
 
@@ -211,14 +211,14 @@ const BookingsPage: React.FC = () => {
             );
             setServices(response.data);
         } catch (err) {
-            console.error("Failed to fetch services", err);
+            console.error("Échec de la récupération des services", err);
         }
     };
 
     const handleDelete = async (id: string) => {
         if (
             typeof window !== "undefined" &&
-            window.confirm("Are you sure you want to delete this booking?")
+            window.confirm("Êtes-vous sûr de vouloir supprimer cette réservation ?")
         ) {
             try {
                 const token = localStorage.getItem("token");
@@ -228,8 +228,8 @@ const BookingsPage: React.FC = () => {
                 setBookings(bookings.filter((booking) => booking.id !== id));
             } catch (err) {
                 const errorMessage =
-                    err instanceof Error ? err.message : "An unknown error occurred";
-                setError("Failed to delete booking. " + errorMessage);
+                    err instanceof Error ? err.message : "Une erreur inconnue est survenue";
+                setError("Échec de la suppression de la réservation. " + errorMessage);
                 console.error(err);
             }
         }
@@ -274,8 +274,8 @@ const BookingsPage: React.FC = () => {
             setFormData({});
         } catch (err) {
             const errorMessage =
-                err instanceof Error ? err.message : "An unknown error occurred";
-            setError("Failed to update booking. " + errorMessage);
+                err instanceof Error ? err.message : "Une erreur inconnue est survenue";
+            setError("Échec de la mise à jour de la réservation. " + errorMessage);
             console.error(err);
         }
     };
@@ -306,8 +306,8 @@ const BookingsPage: React.FC = () => {
             setShowAddForm(false);
             setFormData({});
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-            setError("Failed to add booking. " + errorMessage);
+            const errorMessage = err instanceof Error ? err.message : 'Une erreur inconnue est survenue';
+            setError("Échec de l'ajout de la réservation. " + errorMessage);
             console.error(err);
         }
     };
@@ -327,9 +327,9 @@ const BookingsPage: React.FC = () => {
                 )
             );
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+            const errorMessage = err instanceof Error ? err.message : 'Une erreur inconnue est survenue';
             setError(
-                `Failed to update booking status to ${newStatus}. ${errorMessage}`
+                `Échec de la mise à jour du statut de réservation vers ${newStatus}. ${errorMessage}`
             );
             console.error(err);
         }
@@ -357,9 +357,9 @@ const BookingsPage: React.FC = () => {
             );
         } catch (err) {
             const errorMessage =
-                err instanceof Error ? err.message : "An unknown error occurred";
+                err instanceof Error ? err.message : "Une erreur inconnue est survenue";
             setError(
-                `Failed to update payment status to ${newStatus}. ${errorMessage}`
+                `Échec de la mise à jour du statut de paiement vers ${newStatus}. ${errorMessage}`
             );
             console.error(err);
         }
@@ -470,13 +470,13 @@ const BookingsPage: React.FC = () => {
     const renderBookingForm = (isEditing = false) => (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 border-b pb-3">
-                {isEditing ? "Edit Booking" : "Add New Booking"}
+                {isEditing ? "Modifier la réservation" : "Ajouter une nouvelle réservation"}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        User
+                        Utilisateur
                     </label>
                     <select
                         name="userId"
@@ -484,7 +484,7 @@ const BookingsPage: React.FC = () => {
                         onChange={handleInputChange}
                         className="w-full p-2 border rounded focus:ring-2 focus:ring-[#ccc32d] focus:border-transparent"
                     >
-                        <option value="">Select User</option>
+                        <option value="">Sélectionner un utilisateur</option>
                         {users.map((user) => (
                             <option key={user.id} value={user.id}>
                                 {user.email} ({user.firstName} {user.lastName})
@@ -495,7 +495,7 @@ const BookingsPage: React.FC = () => {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Storage Unit
+                        Unité de stockage
                     </label>
                     <select
                         name="unitId"
@@ -503,11 +503,11 @@ const BookingsPage: React.FC = () => {
                         onChange={handleInputChange}
                         className="w-full p-2 border rounded focus:ring-2 focus:ring-[#ccc32d] focus:border-transparent"
                     >
-                        <option value="">Select Unit</option>
+                        <option value="">Sélectionner une unité</option>
                         {units.map((unit) => (
                             <option key={unit.id} value={unit.id}>
-                                {unit.name || `Unit #${unit.id}`} - {unit.size}m² (
-                                {unit.storageCenter?.name || "Unknown location"})
+                                {unit.name || `Unité #${unit.id}`} - {unit.size}m² (
+                                {unit.storageCenter?.name || "Emplacement inconnu"})
                             </option>
                         ))}
                     </select>
@@ -515,7 +515,7 @@ const BookingsPage: React.FC = () => {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Start Date
+                        Date de début
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -533,7 +533,7 @@ const BookingsPage: React.FC = () => {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Duration (months)
+                        Durée (mois)
                     </label>
                     <input
                         type="number"
@@ -549,7 +549,7 @@ const BookingsPage: React.FC = () => {
                     <>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Status
+                                Statut
                             </label>
                             <select
                                 name="status"
@@ -557,16 +557,16 @@ const BookingsPage: React.FC = () => {
                                 onChange={handleInputChange}
                                 className="w-full p-2 border rounded focus:ring-2 focus:ring-[#ccc32d] focus:border-transparent"
                             >
-                                <option value="PENDING">Pending</option>
-                                <option value="CONFIRMED">Confirmed</option>
-                                <option value="COMPLETED">Completed</option>
-                                <option value="CANCELLED">Cancelled</option>
+                                <option value="PENDING">En attente</option>
+                                <option value="CONFIRMED">Confirmé</option>
+                                <option value="COMPLETED">Terminé</option>
+                                <option value="CANCELLED">Annulé</option>
                             </select>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Payment Status
+                                Statut du paiement
                             </label>
                             <select
                                 name="paymentStatus"
@@ -574,10 +574,10 @@ const BookingsPage: React.FC = () => {
                                 onChange={handleInputChange}
                                 className="w-full p-2 border rounded focus:ring-2 focus:ring-[#ccc32d] focus:border-transparent"
                             >
-                                <option value="PENDING">Pending</option>
-                                <option value="PAID">Paid</option>
-                                <option value="FAILED">Failed</option>
-                                <option value="REFUNDED">Refunded</option>
+                                <option value="PENDING">En attente</option>
+                                <option value="PAID">Payé</option>
+                                <option value="FAILED">Échoué</option>
+                                <option value="REFUNDED">Remboursé</option>
                             </select>
                         </div>
                     </>
@@ -586,7 +586,7 @@ const BookingsPage: React.FC = () => {
 
             <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional Services
+                    Services supplémentaires
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {services.map((service) => (
@@ -602,7 +602,7 @@ const BookingsPage: React.FC = () => {
                                 htmlFor={`service-${service.id}`}
                                 className="ml-2 text-sm text-gray-900"
                             >
-                                {service.name} (${service.price})
+                                {service.name} ({service.price}€)
                             </label>
                         </div>
                     ))}
@@ -616,13 +616,13 @@ const BookingsPage: React.FC = () => {
                             onClick={handleCancelEdit}
                             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 mr-2"
                         >
-                            <FiX className="inline mr-1" /> Cancel
+                            <FiX className="inline mr-1" /> Annuler
                         </button>
                         <button
                             onClick={handleSaveEdit}
                             className="px-4 py-2 bg-[#9f9911] text-white rounded-md hover:bg-[#6e6a0c]"
                         >
-                            <FiCheck className="inline mr-1" /> Save Changes
+                            <FiCheck className="inline mr-1" /> Enregistrer les modifications
                         </button>
                     </>
                 ) : (
@@ -631,13 +631,13 @@ const BookingsPage: React.FC = () => {
                             onClick={() => setShowAddForm(false)}
                             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 mr-2"
                         >
-                            <FiX className="inline mr-1" /> Cancel
+                            <FiX className="inline mr-1" /> Annuler
                         </button>
                         <button
                             onClick={handleAddBooking}
                             className="px-4 py-2 bg-[#9f9911] text-white rounded-md hover:bg-[#6e6a0c]"
                         >
-                            <FiCheck className="inline mr-1" /> Create Booking
+                            <FiCheck className="inline mr-1" /> Créer la réservation
                         </button>
                     </>
                 )}
@@ -804,13 +804,6 @@ const BookingsPage: React.FC = () => {
                                 title="Actualiser"
                             >
                                 <FiRefreshCw size={16} />
-                            </button>
-
-                            <button
-                                className="px-3 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 flex items-center"
-                                title="Exporter en CSV"
-                            >
-                                <FiDownload size={16} />
                             </button>
                         </div>
                     </div>
@@ -981,30 +974,7 @@ const BookingsPage: React.FC = () => {
                                                         >
                                                             {booking.status}
                                                         </div>
-                                                        <div className="mt-1">
-                                                            <select
-                                                                value={booking.paymentStatus}
-                                                                onChange={(e) => {
-                                                                    const value = e.target
-                                                                        .value as Booking["paymentStatus"];
-                                                                    handleUpdatePaymentStatus(booking.id, value);
-                                                                }}
-                                                                className="text-xs border-0 bg-transparent text-gray-500 cursor-pointer hover:text-[#9f9911] focus:ring-0"
-                                                            >
-                                                                <option value="PENDING">
-                                                                    Change to Pending
-                                                                </option>
-                                                                <option value="CONFIRMED">
-                                                                    Change to Confirmed
-                                                                </option>
-                                                                <option value="COMPLETED">
-                                                                    Change to Completed
-                                                                </option>
-                                                                <option value="CANCELLED">
-                                                                    Change to Cancelled
-                                                                </option>
-                                                            </select>
-                                                        </div>
+                                                        
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -1015,26 +985,6 @@ const BookingsPage: React.FC = () => {
                                                             )}`}
                                                         >
                                                             {booking.paymentStatus}
-                                                        </div>
-                                                        <div className="mt-1">
-                                                            <select
-                                                                value={booking.paymentStatus}
-                                                                onChange={(e) => {
-                                                                    const value = e.target
-                                                                        .value as Booking["paymentStatus"];
-                                                                    handleUpdatePaymentStatus(booking.id, value);
-                                                                }}
-                                                                className="text-xs border-0 bg-transparent text-gray-500 cursor-pointer hover:text-[#9f9911] focus:ring-0"
-                                                            >
-                                                                <option value="PENDING">
-                                                                    Change to Pending
-                                                                </option>
-                                                                <option value="PAID">Change to Paid</option>
-                                                                <option value="FAILED">Change to Failed</option>
-                                                                <option value="REFUNDED">
-                                                                    Change to Refunded
-                                                                </option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1058,13 +1008,13 @@ const BookingsPage: React.FC = () => {
                             <div className="flex-1 flex justify-between items-center">
                                 <div>
                                     <p className="text-sm text-gray-700">
-                                        Showing <span className="font-medium">
+                                        Affichage de <span className="font-medium">
                                             {(currentPage - 1) * itemsPerPage + 1}
-                                        </span> to <span className="font-medium">
+                                        </span> à <span className="font-medium">
                                             {Math.min(currentPage * itemsPerPage, sortedBookings.length)}
-                                        </span> of <span className="font-medium">
+                                        </span> sur <span className="font-medium">
                                             {sortedBookings.length}
-                                        </span> bookings
+                                        </span> réservations
                                     </p>
                                 </div>
                                 <div className="flex space-x-2">
@@ -1076,7 +1026,7 @@ const BookingsPage: React.FC = () => {
                                             : 'text-gray-700 bg-white hover:bg-gray-50'
                                             }`}
                                     >
-                                        Previous
+                                        Précédent
                                     </button>
 
                                     {/* Affichage des numéros de page */}
@@ -1101,7 +1051,7 @@ const BookingsPage: React.FC = () => {
                                             : 'text-gray-700 bg-white hover:bg-gray-50'
                                             }`}
                                     >
-                                        Next
+                                        Suivant
                                     </button>
                                 </div>
                             </div>

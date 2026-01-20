@@ -89,9 +89,9 @@ const WaitingListPage: React.FC = () => {
       setWaitingList(sortedList);
       setError(null);
     } catch (err) {
-      console.error("Error fetching waiting list:", err);
-      setError("Failed to fetch waiting list data.");
-      toast.error("Failed to fetch waiting list data.");
+      console.error("Erreur lors de la récupération de la liste d'attente:", err);
+      setError("Échec de la récupération des données de la liste d'attente.");
+      toast.error("Échec de la récupération des données de la liste d'attente.");
     } finally {
       setLoading(false);
     }
@@ -123,15 +123,15 @@ const WaitingListPage: React.FC = () => {
         setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
       }
       await fetchWaitingList();
-      toast.success("Item removed from waiting list successfully!");
+      toast.success("Élément supprimé de la liste d'attente avec succès !");
     } catch (error) {
-      console.error("Error deleting waiting list item:", error);
-      toast.error("Failed to remove item from waiting list.");
+      console.error("Erreur lors de la suppression de l'élément de la liste d'attente:", error);
+      toast.error("Échec de la suppression de l'élément de la liste d'attente.");
     }
   };
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) {
-      toast.info("No items selected.");
+      toast.info("Aucun élément sélectionné.");
       return;
     }
 
@@ -147,10 +147,10 @@ const WaitingListPage: React.FC = () => {
       setSelectedItems([]);
       setSelectAll(false);
       await fetchWaitingList();
-      toast.success(`${selectedItems.length} items removed successfully!`);
+      toast.success(`${selectedItems.length} éléments supprimés avec succès !`);
     } catch (error) {
-      console.error("Error deleting selected items:", error);
-      toast.error("Failed to remove selected items.");
+      console.error("Erreur lors de la suppression des éléments sélectionnés:", error);
+      toast.error("Échec de la suppression des éléments sélectionnés.");
     }
   };
   const handlePrint = () => {
@@ -160,7 +160,7 @@ const WaitingListPage: React.FC = () => {
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
       toast.error(
-        "Could not open print window. Please check your popup settings."
+        "Impossible d'ouvrir la fenêtre d'impression. Veuillez vérifier vos paramètres de fenêtres popup."
       );
       return;
     }
@@ -168,7 +168,7 @@ const WaitingListPage: React.FC = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Waiting List</title>
+          <title>Liste d'Attente</title>
           <style>
             body { font-family: Arial, sans-serif; }
             table { width: 100%; border-collapse: collapse; }
@@ -180,10 +180,10 @@ const WaitingListPage: React.FC = () => {
         </head>
         <body>
           <div class="header">
-            <h1>Waiting List Report</h1>
+            <h1>Rapport de la Liste d'Attente</h1>
           </div>
           <div class="date">
-            <p>Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</p>
+            <p>Généré le : ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</p>
           </div>
           ${printContent.outerHTML}
         </body>
@@ -197,7 +197,7 @@ const WaitingListPage: React.FC = () => {
   };
   const openMessageModal = () => {
     if (selectedItems.length === 0) {
-      toast.info("No items selected.");
+      toast.info("Aucun élément sélectionné.");
       return;
     }
     setShowMessageModal(true);
@@ -208,7 +208,7 @@ const WaitingListPage: React.FC = () => {
   };
   const handleSendMessages = async () => {
     if (selectedItems.length === 0) {
-      toast.info("No items selected.");
+      toast.info("Aucun élément sélectionné.");
       return;
     }
 
@@ -239,7 +239,7 @@ const WaitingListPage: React.FC = () => {
       setSelectedItems([]);
       setSelectAll(false);
     } catch (error) {
-      console.error("Error sending messages:", error);
+      console.error("Erreur lors de l'envoi des messages:", error);
       toast.error("Échec de l'envoi des messages.");
     } finally {
       setSendingMessages(false);
@@ -260,7 +260,7 @@ const WaitingListPage: React.FC = () => {
 
   const applyFilters = () => {
     setCurrentPage(0);
-    toast.success("Filters applied!");
+    toast.success("Filtres appliqués !");
   };
 
   const resetFilters = async () => {
@@ -274,14 +274,14 @@ const WaitingListPage: React.FC = () => {
 
     await fetchWaitingList();
     setCurrentPage(0);
-    toast.success("Filters reset!");
+    toast.success("Filtres réinitialisés !");
   };
 
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "MMM dd, yyyy");
     } catch (error) {
-      return "Invalid date";
+      return "Date invalide";
     }
   };
 

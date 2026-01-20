@@ -1,13 +1,14 @@
 {
   "name": "mon-projet",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 5173",
     "build": "next build",
     "start": "next start -p 5200 -H 0.0.0.0",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "check": "npm outdated"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -34,7 +35,6 @@
     "react-icons": "^5.5.0",
     "react-leaflet": "^5.0.0",
     "react-paginate": "^8.3.0",
-    "react-router-dom": "^7.4.1",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.2",
     "yup": "^1.6.1"
@@ -46,9 +46,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
-    "core-js": "^3.42.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5.4.5"
   }
 }

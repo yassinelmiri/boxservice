@@ -17,6 +17,7 @@ import {
     faChevronUp,
     faRuler,
     faInfoCircle,
+    faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import ReactPaginate from "react-paginate";
 import { motion, AnimatePresence } from "framer-motion";
@@ -69,6 +70,7 @@ interface StorageUnit {
     features: string[];
     createdAt: string;
     lastBookingDate: string;
+    updatedAt: string;
     booking: Booking | null;
 }
 
@@ -81,6 +83,7 @@ interface NewUnitData {
     images: string[];
     features: string[];
     updatedAt?: string;
+    createdAt?: string;
 }
 
 interface Filters {
@@ -98,6 +101,82 @@ const VolumeFormModal = dynamic(
     () => import("@/components/admin/locations/VolumeFormModel"),
     { ssr: false }
 );
+
+// Composant Calendrier
+const CalendarModal = ({ 
+    date, 
+    onClose, 
+    onSave,
+    title 
+}: { 
+    date: string; 
+    onClose: () => void; 
+    onSave: (date: string) => void;
+    title: string;
+}) => {
+    const [selectedDate, setSelectedDate] = useState<string>(date || new Date().toISOString().split('T')[0]);
+
+    const handleSave = () => {
+        onSave(selectedDate);
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 bg-[#00000054] bg-opacity-50 flex justify-center items-center z-50 p-4">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-white p-6 rounded-md w-full max-w-sm"
+            >
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold">{title}</h3>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-gray-700"
+                    >
+                        <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Sélectionner la date
+                        </label>
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-[#dfd750] focus:border-[#dfd750]"
+                        />
+                    </div>
+                    
+                    <div className="bg-gray-50 p-3 rounded-md">
+                        <p className="text-sm text-gray-600">
+                            Date sélectionnée: <strong>{new Date(selectedDate).toLocaleDateString('fr-FR')}</strong>
+                        </p>
+                    </div>
+
+                    <div className="flex justify-end space-x-3 pt-4">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#dfd750]"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            className="px-4 py-2 text-sm font-medium text-white bg-[#9f9911] rounded-md hover:bg-[#6e6a0c] focus:outline-none focus:ring-2 focus:ring-[#dfd750]"
+                        >
+                            Enregistrer
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
 
 const StorageUnitPage = () => {
     const [newUnitData, setNewUnitData] = useState<NewUnitData>({
@@ -117,6 +196,7 @@ const StorageUnitPage = () => {
     const [storageCenters, setStorageCenters] = useState<StorageCenter[]>([]);
     const [storageVolumes, setStorageVolumes] = useState<StorageVolume[]>([]);
     const [units, setUnits] = useState<StorageUnit[]>([]);
+    const [allUnits, setAllUnits] = useState<StorageUnit[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -125,14 +205,38 @@ const StorageUnitPage = () => {
     const [showPopup, setShowPopup] = useState<boolean>(false);
     const [selectedUnit, setSelectedUnit] = useState<StorageUnit | null>(null);
     const [showFilters, setShowFilters] = useState<boolean>(false);
-    const [filters, setFilters] = useState<Filters>({
-        minPrice: "",
-        maxPrice: "",
-        available: "",
-        storageCenterId: "",
-        volume: "",
-        features: [],
+    
+    // États pour les calendriers
+    const [showCreationCalendar, setShowCreationCalendar] = useState<{show: boolean, unit: StorageUnit | null}>({show: false, unit: null});
+    const [showReservationCalendar, setShowReservationCalendar] = useState<{show: boolean, unit: StorageUnit | null}>({show: false, unit: null});
+    
+    // Charger les filtres depuis localStorage
+    const [filters, setFilters] = useState<Filters>(() => {
+        if (typeof window !== 'undefined') {
+            const savedFilters = localStorage.getItem('storageUnitFilters');
+            return savedFilters ? JSON.parse(savedFilters) : {
+                minPrice: "",
+                maxPrice: "",
+                available: "",
+                storageCenterId: "",
+                volume: "",
+                features: [],
+            };
+        }
+        return {
+            minPrice: "",
+            maxPrice: "",
+            available: "",
+            storageCenterId: "",
+            volume: "",
+            features: [],
+        };
     });
+
+    // Sauvegarder les filtres dans localStorage à chaque modification
+    useEffect(() => {
+        localStorage.setItem('storageUnitFilters', JSON.stringify(filters));
+    }, [filters]);
 
     const fetchStorageCentersAndUnits = async () => {
         try {
@@ -146,7 +250,17 @@ const StorageUnitPage = () => {
             const unitsResponse = await axios.get(`${apiUrl}/storage/units`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setUnits(unitsResponse.data);
+            setAllUnits(unitsResponse.data);
+            
+            if (Object.values(filters).some(value => 
+                value !== "" && 
+                value !== null && 
+                (Array.isArray(value) ? value.length > 0 : true)
+            )) {
+                applyFilters();
+            } else {
+                setUnits(unitsResponse.data);
+            }
         } catch (err) {
             setError("Échec du chargement des données.");
             toast.error("Échec du chargement des données.");
@@ -186,7 +300,7 @@ const StorageUnitPage = () => {
                     className="bg-white p-6 rounded-md w-full max-w-md"
                 >
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold">Détails de la dernier réservation</h3>
+                        <h3 className="text-xl font-bold">Détails de la Réservation récente</h3>
                         <button
                             onClick={() => setShowBookingPopup(false)}
                             className="text-gray-500 hover:text-gray-700"
@@ -201,7 +315,7 @@ const StorageUnitPage = () => {
                             <span>{selectedBooking.id}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-medium">Name Client:</span>
+                            <span className="font-medium">Nom Client:</span>
                             <span>{selectedBooking.customer?.firstName} {selectedBooking.customer?.lastName}</span>
                         </div>
                         <div className="flex justify-between">
@@ -234,6 +348,60 @@ const StorageUnitPage = () => {
             </div>
         );
     };
+
+    // Fonction pour mettre à jour la date de création (createdAt)
+    const handleUpdateCreationDate = async (unitId: string, newDate: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            await axios.patch(
+                `${apiUrl}/storage/units/${unitId}`,
+                { 
+                    createdAt: newDate 
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            await fetchStorageCentersAndUnits();
+            toast.success("Date de création mise à jour avec succès !");
+        } catch (error: any) {
+            console.error("Erreur lors de la mise à jour de la date de création:", error);
+            toast.error("Échec de la mise à jour de la date de création.");
+        }
+    };
+
+    const handleUpdateLastReservationDate = async (unitId: string, newDate: string) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            await axios.patch(
+                `${apiUrl}/storage/units/${unitId}`,
+                { 
+                    updatedAt: newDate 
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            await fetchStorageCentersAndUnits();
+            toast.success("Date de Réservation récente mise à jour avec succès !");
+        } catch (error: any) {
+            console.error("Erreur lors de la mise à jour de la date de réservation:", error);
+            toast.error("Échec de la mise à jour de la date de réservation.");
+        }
+    };
+
     const applyFilters = async () => {
         try {
             setLoading(true);
@@ -252,11 +420,21 @@ const StorageUnitPage = () => {
                 },
                 {} as Record<string, any>
             );
-            const response = await axios.get(`${apiUrl}/storage/units/filter`, {
-                headers: { Authorization: `Bearer ${token}` },
-                params: cleanFilters,
-            });
-            setUnits(response.data);
+
+            if (Object.keys(cleanFilters).length === 0) {
+                const unitsResponse = await axios.get(`${apiUrl}/storage/units`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setUnits(unitsResponse.data);
+                setAllUnits(unitsResponse.data);
+            } else {
+                const response = await axios.get(`${apiUrl}/storage/units/filter`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: cleanFilters,
+                });
+                setUnits(response.data);
+            }
+            
             setCurrentPage(0);
             toast.success("Filtres appliqués avec succès !");
         } catch (error) {
@@ -268,14 +446,17 @@ const StorageUnitPage = () => {
     };
 
     const resetFilters = async () => {
-        setFilters({
+        const defaultFilters = {
             minPrice: "",
             maxPrice: "",
             available: "",
             storageCenterId: "",
             volume: "",
             features: [],
-        });
+        };
+        
+        setFilters(defaultFilters);
+        localStorage.removeItem('storageUnitFilters');
 
         try {
             const token = localStorage.getItem("token");
@@ -283,6 +464,7 @@ const StorageUnitPage = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setUnits(unitsResponse.data);
+            setAllUnits(unitsResponse.data);
             setCurrentPage(0);
             toast.success("Filtres réinitialisés !");
         } catch (error) {
@@ -368,7 +550,15 @@ const StorageUnitPage = () => {
             formData.append("code", newUnitData.code);
             formData.append("volume", newUnitData.volume);
 
+            // Ajouter createdAt si modifié
+            if (newUnitData.createdAt) {
+                formData.append("createdAt", newUnitData.createdAt);
+            }
 
+            // Ajouter updatedAt si modifié
+            if (newUnitData.updatedAt) {
+                formData.append("updatedAt", newUnitData.updatedAt);
+            }
 
             if (newUnitData.features && newUnitData.features.length > 0) {
                 newUnitData.features.forEach((feature, index) => {
@@ -393,10 +583,7 @@ const StorageUnitPage = () => {
                 }
             );
 
-            const unitsResponse = await axios.get(`${apiUrl}/storage/units`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setUnits(unitsResponse.data);
+            await fetchStorageCentersAndUnits();
 
             setShowPopup(false);
             setImageFiles([]);
@@ -459,10 +646,8 @@ const StorageUnitPage = () => {
 
             toast.success("Unité créée avec succès !");
 
-            const unitsResponse = await axios.get(`${apiUrl}/storage/units`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setUnits(unitsResponse.data);
+            await fetchStorageCentersAndUnits();
+            
             setShowPopup(false);
             setImageFiles([]);
             setNewUnitData({
@@ -490,6 +675,7 @@ const StorageUnitPage = () => {
         setSearchTerm(e.target.value);
         setCurrentPage(0);
     };
+    
     const handleCreateVolume = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -518,7 +704,8 @@ const StorageUnitPage = () => {
             code: unit.code,
             features: unit.features || [],
             images: unit.images || [],
-            updatedAt: unit.lastBookingDate || unit.createdAt
+            updatedAt: unit.updatedAt,
+            createdAt: unit.createdAt
         });
         setShowPopup(true);
     };
@@ -546,14 +733,8 @@ const StorageUnitPage = () => {
                 }
             );
 
-            const unitsResponse = await axios.get(`${apiUrl}/storage/units`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
-
-            setUnits(unitsResponse.data);
+            await fetchStorageCentersAndUnits();
+            
             toast.success(
                 `Unité ${newAvailabilityStatus
                     ? "marquée comme disponible"
@@ -582,11 +763,8 @@ const StorageUnitPage = () => {
                 }
             );
 
-            const unitsResponse = await axios.get(`${apiUrl}/storage/units`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            setUnits(unitsResponse.data);
+            await fetchStorageCentersAndUnits();
+            
             toast.success("Unité supprimée avec succès !");
         } catch (error: any) {
             console.error(
@@ -596,7 +774,6 @@ const StorageUnitPage = () => {
             toast.error("Échec de la suppression de l'unité.");
         }
     };
-
 
     const ImageCard = ({
         file,
@@ -659,6 +836,7 @@ const StorageUnitPage = () => {
             </div>
         );
     if (error) return <p className="text-red-500 text-center text-xl mt-6">{error}</p>;
+    
     return (
         <AdminLayout>
             <div className="container mx-auto px-4 py-6">
@@ -852,6 +1030,26 @@ const StorageUnitPage = () => {
                                         </div>
                                     </div>
 
+                                    {/* Section des caractéristiques */}
+                                    <div className="mt-4">
+                                        <label className="text-sm font-medium text-gray-600 mb-2 block">
+                                            Caractéristiques
+                                        </label>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                            {availableFeatures.map((feature) => (
+                                                <label key={feature} className="flex items-center space-x-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filters.features.includes(feature)}
+                                                        onChange={() => handleFilterFeatureChange(feature)}
+                                                        className="h-4 w-4 text-[#9f9911] rounded focus:ring-[#dfd750]"
+                                                    />
+                                                    <span className="text-sm text-gray-700">{feature}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                     <div className="mt-4 flex justify-end">
                                         <button
                                             onClick={applyFilters}
@@ -900,7 +1098,7 @@ const StorageUnitPage = () => {
                                         </div>
                                     </th>
                                     <th scope="col" className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                        Dernière réservation
+                                        Réservation récente
                                     </th>
                                     <th scope="col" className="px-6 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                         Actions
@@ -966,14 +1164,38 @@ const StorageUnitPage = () => {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {unit.createdAt ? new Date(unit.createdAt).toLocaleDateString() : new Date(unit.createdAt).toLocaleDateString()}
+                                                <button
+                                                    onClick={() => setShowCreationCalendar({show: true, unit})}
+                                                    className="flex items-center space-x-1 hover:text-[#9f9911] hover:underline transition-colors cursor-pointer group"
+                                                    title="Modifier la date de création"
+                                                >
+                                                    <FontAwesomeIcon 
+                                                        icon={faCalendarAlt} 
+                                                        className="w-3 h-3 text-gray-400 group-hover:text-[#9f9911]" 
+                                                    />
+                                                    <span>
+                                                        {unit.createdAt ? new Date(unit.createdAt).toLocaleDateString() : 'N/A'}
+                                                    </span>
+                                                </button>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {unit.lastBookingDate ? (
-                                                    <>
-                                                        <div>{new Date(unit.lastBookingDate).toLocaleDateString()}</div>
-                                                    </>
-                                                ) : new Date(unit.createdAt).toLocaleDateString()}
+                                                <button
+                                                    onClick={() => setShowReservationCalendar({show: true, unit})}
+                                                    className="flex items-center space-x-1 hover:text-[#9f9911] hover:underline transition-colors cursor-pointer group"
+                                                    title="Modifier la date de Réservation récente"
+                                                >
+                                                    <FontAwesomeIcon 
+                                                        icon={faCalendarAlt} 
+                                                        className="w-3 h-3 text-gray-400 group-hover:text-[#9f9911]" 
+                                                    />
+                                                    <span>
+                                                        {unit.updatedAt ? (
+                                                            new Date(unit.updatedAt).toLocaleDateString()
+                                                        ) : (
+                                                            'Aucune réservation'
+                                                        )}
+                                                    </span>
+                                                </button>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex justify-end space-x-2">
@@ -1176,21 +1398,36 @@ const StorageUnitPage = () => {
                                             />
                                         </div>
                                     </div>
-                                    {/* Last Reservation Date */}
+                                    {/* Dates de création et réservation */}
                                     {selectedUnit && (
-                                        <div className="space-y-2">
-                                            <label htmlFor="lastReservationDate" className="block text-sm font-medium text-gray-700">
-                                                Dernière réservation
-                                            </label>
-                                            <input
-                                                type="date"
-                                                id="lastReservationDate"
-                                                name="lastReservationDate"
-                                                value={newUnitData.updatedAt ? new Date(newUnitData.updatedAt).toISOString().split('T')[0] : ''}
-                                                onChange={(e) => setNewUnitData({ ...newUnitData, updatedAt: e.target.value })}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-[#dfd750] focus:border-[#dfd750]"
-                                            />
-                                        </div>
+                                        <>
+                                            <div className="space-y-2">
+                                                <label htmlFor="createdAt" className="block text-sm font-medium text-gray-700">
+                                                    Date de création
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    id="createdAt"
+                                                    name="createdAt"
+                                                    value={newUnitData.createdAt ? new Date(newUnitData.createdAt).toISOString().split('T')[0] : ''}
+                                                    onChange={(e) => setNewUnitData({ ...newUnitData, createdAt: e.target.value })}
+                                                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-[#dfd750] focus:border-[#dfd750]"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="updatedAt" className="block text-sm font-medium text-gray-700">
+                                                    Réservation récente
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    id="updatedAt"
+                                                    name="updatedAt"
+                                                    value={newUnitData.updatedAt ? new Date(newUnitData.updatedAt).toISOString().split('T')[0] : ''}
+                                                    onChange={(e) => setNewUnitData({ ...newUnitData, updatedAt: e.target.value })}
+                                                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-[#dfd750] focus:border-[#dfd750]"
+                                                />
+                                            </div>
+                                        </>
                                     )}
                                     {/* Images */}
                                     <div className="space-y-2">
@@ -1278,6 +1515,26 @@ const StorageUnitPage = () => {
                 )}
             </div>
             {showBookingPopup && <BookingPopup />}
+            
+            {/* Calendrier pour la date de création */}
+            {showCreationCalendar.show && showCreationCalendar.unit && (
+                <CalendarModal
+                    date={showCreationCalendar.unit.createdAt}
+                    onClose={() => setShowCreationCalendar({show: false, unit: null})}
+                    onSave={(newDate) => handleUpdateCreationDate(showCreationCalendar.unit!.id, newDate)}
+                    title="Modifier la date de création"
+                />
+            )}
+            
+            {/* Calendrier pour la date de Réservation récente */}
+            {showReservationCalendar.show && showReservationCalendar.unit && (
+                <CalendarModal
+                    date={showReservationCalendar.unit.updatedAt}
+                    onClose={() => setShowReservationCalendar({show: false, unit: null})}
+                    onSave={(newDate) => handleUpdateLastReservationDate(showReservationCalendar.unit!.id, newDate)}
+                    title="Modifier la date de Réservation récente"
+                />
+            )}
         </AdminLayout>
     );
 };

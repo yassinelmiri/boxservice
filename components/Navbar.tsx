@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, ShoppingCart, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/public/assets/image/logo.png";
 import { FiLogIn, FiLogOut, FiUser } from "react-icons/fi";
@@ -12,8 +12,6 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [servicesTimeout, setServicesTimeout] = useState<NodeJS.Timeout | null>(null);
   const [showAccountPopup, setShowAccountPopup] = useState(false);
@@ -59,11 +57,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCartItems(cart);
-  }, [isCartOpen]);
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -76,16 +69,6 @@ const Navbar = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     router.push("/");
-  };
-
-  const toggleCartPopup = () => {
-    setIsCartOpen(!isCartOpen);
-  };
-
-  const removeFromCart = (unitId: string) => {
-    const updatedCart = cartItems.filter((unit) => unit.id !== unitId);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    setCartItems(updatedCart);
   };
 
   const handleServicesMouseEnter = () => {
@@ -118,15 +101,10 @@ const Navbar = () => {
     setIsServicesOpen(!isServicesOpen);
   };
 
-  const handleCheckout = () => {
-    if (cartItems.length > 0) {
-      router.push(`/booking/${cartItems[0].id}`);
-    }
-  };
-
   const closeServicesDropdown = () => {
     setIsServicesOpen(false);
   };
+  
   const navAnimation = {
     hidden: { opacity: 0, y: -20 },
     visible: {
@@ -134,7 +112,7 @@ const Navbar = () => {
       y: 0,
       transition: {
         duration: 0.4,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94] as const
       }
     }
   };
@@ -146,7 +124,7 @@ const Navbar = () => {
       x: 0,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94] as const
       }
     }
   };
@@ -159,7 +137,7 @@ const Navbar = () => {
       scale: 1,
       transition: {
         duration: 0.2,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94] as const
       }
     },
     exit: {
@@ -168,7 +146,7 @@ const Navbar = () => {
       scale: 0.95,
       transition: {
         duration: 0.2,
-        ease: "easeIn"
+        ease: [0.55, 0.085, 0.68, 0.53] as const
       }
     }
   };
@@ -180,7 +158,7 @@ const Navbar = () => {
       height: "auto",
       transition: {
         duration: 0.3,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94] as const
       }
     },
     exit: {
@@ -188,7 +166,7 @@ const Navbar = () => {
       height: 0,
       transition: {
         duration: 0.3,
-        ease: "easeIn"
+        ease: [0.55, 0.085, 0.68, 0.53] as const
       }
     }
   };
@@ -201,7 +179,7 @@ const Navbar = () => {
       scale: 1,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94] as const
       }
     },
     exit: {
@@ -210,7 +188,7 @@ const Navbar = () => {
       scale: 0.95,
       transition: {
         duration: 0.3,
-        ease: "easeIn"
+        ease: [0.55, 0.085, 0.68, 0.53] as const
       }
     }
   };

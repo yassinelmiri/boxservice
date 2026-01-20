@@ -1,10 +1,10 @@
 'use client';
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 const ConditionsGenerales = () => {
-  // Configuration des animations
-  const containerVariants = {
+  // Configuration des animations avec typage correct
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -15,16 +15,21 @@ const ConditionsGenerales = () => {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
         duration: 0.4,
-        ease: "easeOut"
+        ease: [0.25, 0.46, 0.45, 0.94] // Utilisez un array au lieu d'un string
       }
     }
+  };
+
+  const fadeInVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
   };
 
   return (
@@ -55,8 +60,9 @@ const ConditionsGenerales = () => {
       {/* Contenu */}
       <motion.section 
         className="py-16 bg-white"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial="hidden"
+        animate="visible"
+        variants={fadeInVariants}
         transition={{ duration: 0.6 }}
       >
         <div className="max-w-5xl px-6 mx-auto prose prose-lg sm:px-8 lg:prose-xl">
@@ -67,7 +73,10 @@ const ConditionsGenerales = () => {
             viewport={{ once: true, margin: "-100px" }}
           >
             {/* Titre principal */}
-            <motion.h2 className="text-2xl font-bold text-center text-gray-800 md:text-3xl" variants={itemVariants}>
+            <motion.h2 
+              className="text-2xl font-bold text-center text-gray-800 md:text-3xl" 
+              variants={itemVariants}
+            >
               Conditions générales du contrat de mise à disposition d'un box
             </motion.h2>
             <motion.p className="text-center text-gray-600" variants={itemVariants}>
@@ -107,7 +116,6 @@ const ConditionsGenerales = () => {
                 Le Client reconnaît avoir sous sa responsabilité la clé, le système de fermeture du box ainsi que son code d'accès au Box. Le Client a l'obligation d'utiliser exclusivement le système de fermeture fourni lors de la prise de possession du box. En cas de perte de la clé, le Client a la possibilité de passer commande d'un double à ses frais via l'espace client ou d'obtenir l'autorisation expresse de faire intervenir un serrurier à ses frais pour forcer l'ouverture du Box (obligation est alors faite de demander la fourniture d'un nouveau système de fermeture au gestionnaire du parc à ses frais).
               </p>
 
-              {/* Continuer avec tous les articles... */}
               <p className="mb-2 font-semibold text-gray-700">2.4. Responsabilité</p>
               <p className="mb-4 text-gray-600">
                 Le Client est le seul responsable de l'ouverture et de la fermeture de son Box. Le Box doit obligatoirement rester fermé et verrouillé en cas d'absence physique du Client sur l'emplacement hébergeant le Box du Client ainsi que les autres espaces de stockage de la Société, ci-après dénommé « le Site ». Dans le cas où le Box serait resté ouvert, la Société ne saurait être tenue pour responsable des pertes, des vols ou des dégradations des biens du Client à l'intérieur du Box. La Société se réserve le droit de fermer et de verrouiller par tout moyen le Box du Client resté ouvert.
@@ -128,8 +136,6 @@ const ConditionsGenerales = () => {
                 <li className="mb-1">de fumer dans le Box et dans l'enceinte du Site</li>
                 <li>de mettre à disposition d'un tiers toute ou partie de son Box que ce soit à titre gracieux ou non</li>
               </ul>
-
-              {/* Continuer avec tous les autres articles... */}
             </motion.div>
 
             {/* Article 3 */}
@@ -145,8 +151,107 @@ const ConditionsGenerales = () => {
               <p className="mb-2 text-gray-600">
                 <span className="font-semibold">3.2.</span> La vitesse maximale autorisée au sein du Site est de 15 km/h. Les règles du code de la route s'appliquent sur le Site.
               </p>
+            </motion.div>
 
-              {/* Continuer avec tous les articles jusqu'à 15... */}
+            {/* Articles suivants... */}
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                4 - BIENS INTERDITS
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Il est formellement interdit d'entreposer dans le Box tout objet ou substance illicite, dangereuse, inflammable, explosive, toxique, radioactive, périssable, vivante ou toute autre matière dont l'entreposage serait contraire à la réglementation en vigueur ou susceptible de causer des dommages aux biens ou aux personnes.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                5 - DURÉE DU CONTRAT
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Le présent contrat est conclu pour une durée déterminée ou indéterminée selon les termes spécifiés dans la convention particulière. En cas de contrat à durée déterminée, celui-ci est automatiquement reconduit par tacite reconduction pour des périodes identiques, sauf résiliation par l'une ou l'autre des parties selon les modalités prévues au contrat.
+              </p>
+            </motion.div>
+
+            {/* Articles 6 à 14... */}
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                6 - PRIX ET PAIEMENT
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Le prix de la mise à disposition du Box est fixé dans la convention particulière. Les modalités de paiement sont précisées dans le contrat. Tout retard de paiement pourra entraîner la suspension de l'accès au Box et/ou la résiliation du contrat.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                7 - ASSURANCE
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Le Client est tenu de souscrire une assurance couvrant les biens entreposés dans le Box contre tous les risques. La Société décline toute responsabilité en cas de vol, dégradation ou destruction des biens entreposés.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                8 - RESPONSABILITÉ
+              </h3>
+              <p className="mb-4 text-gray-600">
+                La Société ne saurait être tenue responsable des dommages directs ou indirects subis par le Client ou ses biens, sauf en cas de faute lourde ou intentionnelle de sa part. Le Client est seul responsable des dommages causés au Box, au Site ou aux biens d'autrui.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                9 - RÉSILIATION
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Chaque partie peut résilier le contrat selon les modalités prévues dans la convention particulière. En cas de manquement grave aux obligations contractuelles, la résiliation pourra être prononcée sans préavis.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                10 - RESTITUTION DU BOX
+              </h3>
+              <p className="mb-4 text-gray-600">
+                À l'expiration du contrat, le Client doit libérer le Box en le laissant dans l'état où il l'a trouvé. Tout bien restant dans le Box après la date de libération pourra être considéré comme abandonné et pourra être détruit ou vendu aux frais du Client.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                11 - DONNÉES PERSONNELLES
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Les données personnelles du Client sont traitées conformément à la politique de confidentialité de la Société et à la réglementation applicable en matière de protection des données.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                12 - LITIGES
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Tout litige relatif au présent contrat sera soumis à la compétence des tribunaux du lieu du siège social de la Société.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                13 - DROIT APPLICABLE
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Le présent contrat est régi par le droit français.
+              </p>
+            </motion.div>
+
+            <motion.div className="mb-12" variants={itemVariants}>
+              <h3 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2 border-gray-200 md:text-2xl">
+                14 - MODIFICATION DU CONTRAT
+              </h3>
+              <p className="mb-4 text-gray-600">
+                La Société se réserve le droit de modifier les présentes conditions générales. Les modifications seront notifiées au Client et s'appliqueront à compter de leur entrée en vigueur.
+              </p>
             </motion.div>
 
             {/* Article 15 */}
@@ -165,7 +270,6 @@ const ConditionsGenerales = () => {
                 La Société a mis en place une liste noire ayant notamment pour objectif de lutter contre la fraude, les impayés et les incivilités sur un centre de stockage. En conséquence, la Société est responsable du respect des obligations posées par la réglementation applicable, comprenant notamment l'information des personnes concernées, l'exercice de leurs droits, et la mise en œuvre des mesures de sécurité adaptées. En cas de survenue d'un incident, le Client sera informé au préalable et par tout moyen du risque d'être ajouté à cette liste noire. Le Client aura dès lors 8 jours pour régulariser sa situation ou faire part de ses observations. La Société informera par tout moyen le Client dès son ajout dans la liste noire. La Société se réserve le droit de suspendre, de ne pas renouveler, ou de ne pas donner accès aux services proposés à tout Client inscrit en liste noire. Le Client a un droit à l'oubli et ne pourra être inscrit plus de 5 ans sur la liste noire de la Société.
               </p>
 
-              {/* Derniers paragraphes */}
               <p className="mb-4 text-gray-600">
                 15.8. En cas de réservation effectuée à distance (par internet ou par téléphone) par le Client agissant en qualité de consommateur ou de non-professionnel tels que définis par le Code de la Consommation, celui-ci dispose d'un délai légal d'une durée de quatorze (14) jours francs pour exercer son droit de rétractation et annuler sa commande sans frais ni pénalité. Les sommes versées par le Client lui seront intégralement remboursées sous un délai maximum de trente (30) jours à compter de la date à laquelle la Société aura été informée de la rétractation du Client. Le délai d'exercice du droit de rétractation court dès le lendemain du jour de la réservation conclue à distance. Lorsque le délai expire un samedi, un dimanche ou un jour férié ou chômé, il est prorogé jusqu'au premier jour ouvrable suivant. Ce droit pourra être exercé à l'aide d'une demande via l'espace client. Il ne pourra toutefois pas être exercé dès lors que la prestation de la Société aura commencé à la demande expresse du Client, avant la fin du délai de rétractation.
               </p>

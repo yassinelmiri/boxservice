@@ -87,5 +87,3 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 - **Marouane Fagri** - Développeur Backend
 - **El Hamra Mohammed** - Encadrement
 
-# boxservice
-# boxservice

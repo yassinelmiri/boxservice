@@ -85,8 +85,8 @@ const BookingForm = ({
         const response = await axios.get(`${apiUrl}/services`);
         setServices(response.data);
       } catch (err) {
-        console.error("Failed to fetch services", err);
-        setError("Failed to load available services");
+        console.error("Échec de la récupération des services", err);
+        setError("Échec du chargement des services disponibles");
       }
     };
 
@@ -119,7 +119,7 @@ const BookingForm = ({
 
       setTotalPrice(totalPrice);
     } catch (err) {
-      console.error("Error calculating price:", err);
+      console.error("Erreur lors du calcul du prix:", err);
     }
   };
 
@@ -189,10 +189,10 @@ const BookingForm = ({
         onBookingComplete(response.data);
       }
     } catch (err: any) {
-      console.error("Booking error:", err);
+      console.error("Erreur de réservation:", err);
       setError(
         err.response?.data?.message ||
-          "Failed to complete booking. Please try again."
+          "Échec de la finalisation de la réservation. Veuillez réessayer."
       );
     } finally {
       setLoading(false);
@@ -551,7 +551,7 @@ const BookingForm = ({
       <div className="max-w-2xl mt-28 mx-auto my-8">
         <div className="mb-8">
           <div className="flex justify-between mb-2">
-            {["Booking Details", "Services", "Payment", "Confirmation"].map(
+            {["Détails réservation", "Services", "Paiement", "Confirmation"].map(
               (step, idx) => (
                 <div
                   key={idx}

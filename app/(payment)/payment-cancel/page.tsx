@@ -18,38 +18,38 @@ function PaymentCancelContent() {
         method: "POST",
       })
         .then((response) => {
-          if (!response.ok) throw new Error("Network response error");
+          if (!response.ok) throw new Error("Erreur de réponse réseau");
           return response.json();
         })
         .then((data) => {
-          setMessage("Payment canceled successfully. You can try again later.");
+          setMessage("Paiement annulé avec succès. Vous pouvez réessayer plus tard.");
           setLoading(false);
           setTimeout(() => {
             window.location.href = "/";
           }, 5000);
         })
         .catch((error) => {
-          console.error("Error cancelling payment:", error);
-          setMessage("Failed to cancel payment. Please contact support.");
+          console.error("Erreur lors de l'annulation du paiement :", error);
+          setMessage("Échec de l'annulation du paiement. Veuillez contacter le support.");
           setLoading(false);
         });
     } else {
       setLoading(false);
-      setMessage("Invalid session ID");
+      setMessage("ID de session invalide");
     }
   }, [sessionId]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center">
-      <h1 className="text-3xl font-bold text-red-600">Payment Canceled</h1>
-      {loading ? <p>Processing cancellation...</p> : <p>{message}</p>}
+      <h1 className="text-3xl font-bold text-red-600">Paiement Annulé</h1>
+      {loading ? <p>Traitement de l'annulation...</p> : <p>{message}</p>}
     </div>
   );
 }
 
 export default function PaymentCancel() {
   return (
-    <Suspense fallback={<div className="flex flex-col items-center justify-center h-screen text-center">Loading...</div>}>
+    <Suspense fallback={<div className="flex flex-col items-center justify-center h-screen text-center">Chargement...</div>}>
       <PaymentCancelContent />
     </Suspense>
   );
